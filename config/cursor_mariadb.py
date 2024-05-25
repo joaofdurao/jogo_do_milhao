@@ -1,7 +1,5 @@
 """
-
-    This script connects to MariaDB Platform and creates a cursor object.
-
+This script connects to MariaDB Platform and creates a cursor object.
 """
 import sys
 import mariadb
@@ -46,6 +44,7 @@ class CursorMariaDB:
             db_schema (str): The name of the database schema.
         
         Returns:
+            conn (connection): The connection object for the MariaDB connection.
             cur (cursor): The cursor object for the MariaDB connection.
         """
         # Connect to MariaDB Platform
@@ -64,4 +63,4 @@ class CursorMariaDB:
 
         # Get Cursor
         cur = conn.cursor()
-        return cur
+        return conn, cur
