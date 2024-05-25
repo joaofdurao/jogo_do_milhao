@@ -1,15 +1,14 @@
 """
-This module contains the AbstractDAO class, which is an abstract class
+This module contains the EntityDAO class, which is an abstract class
 for Data Access Objects (DAOs) with basic CRUD operations.
 """
 
-from abc import ABC, abstractmethod
 import mariadb
 from config.cursor_mariadb import CursorMariaDB
 
 
 
-class AbstractDAO(ABC):
+class EntityDAO():
     """
     Abstract class for Data Access Objects (DAOs) with basic CRUD operations.
     """
@@ -22,31 +21,29 @@ class AbstractDAO(ABC):
             operation: The operation to perform (CREATE, FIND, UPDATE, DELETE).
             *args: Additional arguments based on the operation.
         """
-        self.conn, self.cursor = self.connect()
+        self.conn, self.cursor = self._connect()
         if operation == "CREATE":
-            self.create_result = self.create(*args)
+            self.transaction_result = self._create(*args)
         elif operation == "FIND":
-            self.find_result = self.find_by_id(*args)
+            self.transaction_result = self._find_by_id(*args)
         elif operation == "UPDATE":
-            self.update_result = self.update(*args)
+            self.transaction_result = self._update(*args)
         elif operation == "DELETE":
-            self.delete_result = self.delete(*args)
+            self.transaction_result = self._delete(*args)
         else:
             print ("Invalid operation")
         self.conn.close()
 
-    @abstractmethod
-    def connect(self):
+    def _connect(self):
         """
         Connects to the database.
 
         Returns:
             The database connection and cursor objects.
         """
-        return CursorMariaDB()
+        return CursorMariaDB().create_connection()
 
-    @abstractmethod
-    def create(self, data_dict):
+    def _create(self, data_dict):
         """
         Creates a new record in the database.
 
@@ -56,7 +53,7 @@ class AbstractDAO(ABC):
         Returns:
             True if the record was created successfully, False otherwise.
         """
-        table_name = str(str(self.__class__.__name__), "_tb")
+        table_name = str(self.__class__.__name__).lower() + "_tb"
         columns = ", ".join([f"{column}" for column in data_dict.keys()])
         values_space = ", ".join("?" * len(data_dict.keys()))
         query = f"INSERT INTO {table_name} ({columns}) VALUES ({values_space})"
@@ -72,8 +69,7 @@ class AbstractDAO(ABC):
             self.conn.rollback()
             return False
 
-    @abstractmethod
-    def find_by_id(self, entity_id):
+    def _find_by_id(self, entity_id):
         """
         Finds a record in the database based on the given entity ID.
 
@@ -83,11 +79,11 @@ class AbstractDAO(ABC):
         Returns:
             The matching record, or None if not found.
         """
-        table_name = str(str(self.__class__.__name__), "_tb")
+        table_name = str(self.__class__.__name__).lower() + "_tb"
         query = f"SELECT * FROM {table_name} WHERE id = {entity_id}"
         try:
             self.cursor.execute(query)
-            result = self.cursor
+            result = self.cursor.fetchone()
             if result:
                 return result
             else:
@@ -97,8 +93,7 @@ class AbstractDAO(ABC):
             print(f"Error finding record: {e}")
             return None
 
-    @abstractmethod
-    def update(self, data_dict, entity_id):
+    def _update(self, data_dict, entity_id):
         """
         Updates a record in the database based on the given ID.
 
@@ -109,7 +104,7 @@ class AbstractDAO(ABC):
         Returns:
             True if the update was successful, False otherwise.
         """
-        table_name = str(str(self.__class__.__name__), "_tb")
+        table_name = str(self.__class__.__name__).lower() + "_tb"
         columns = ", ".join([f"{column} = ?" for column in data_dict.keys()])
         query = f"UPDATE {table_name} SET {columns} WHERE id = {entity_id}"
         values = tuple(data_dict.values())
@@ -124,8 +119,7 @@ class AbstractDAO(ABC):
             self.conn.rollback()
             return False
 
-    @abstractmethod
-    def delete(self, entity_id):
+    def _delete(self, entity_id):
         """
         Deletes a record from the database based on the given entity ID.
 
@@ -135,7 +129,7 @@ class AbstractDAO(ABC):
         Returns:
             True if the deletion was successful, False otherwise.
         """
-        table_name = str(str(self.__class__.__name__), "_tb")
+        table_name = str(self.__class__.__name__).lower() + "_tb"
         query = f"DELETE FROM {table_name} WHERE id = {entity_id}"
 
         try:

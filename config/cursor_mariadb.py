@@ -28,11 +28,8 @@ class CursorMariaDB:
     DB_PORT = 3306
     DB_SCHEMA = "qsm_db"
 
-    def __init__(self):
-        self.cursor = self.create_connection(self.DB_USER, self.DB_USER_PASSWD, self.DB_HOST, 
-                                          self.DB_PORT, self.DB_SCHEMA)
 
-    def create_connection(self, db_user, db_password, db_host, db_port, db_schema):
+    def create_connection(self):
         """
         Create a connection and a cursor object to MariaDB Platform.
         
@@ -50,11 +47,11 @@ class CursorMariaDB:
         # Connect to MariaDB Platform
         try:
             conn = mariadb.connect(
-                user=db_user,
-                password=db_password,
-                host=db_host,
-                port=db_port,
-                database=db_schema
+                user = self.DB_USER,
+                password = self.DB_USER_PASSWD,
+                host = self.DB_HOST,
+                port = self.DB_PORT,
+                database = self.DB_SCHEMA
             )
             print("Connected to MariaDB Platform!")
         except mariadb.Error as e:
