@@ -31,10 +31,10 @@ class CursorMariaDB:
     DB_SCHEMA = "qsm_db"
 
     def __init__(self):
-        self.cursor = self.create_connect(self.DB_USER, self.DB_USER_PASSWD, self.DB_HOST, 
+        self.cursor = self.create_connection(self.DB_USER, self.DB_USER_PASSWD, self.DB_HOST, 
                                           self.DB_PORT, self.DB_SCHEMA)
 
-    def create_connect(self, db_user, db_password, db_host, db_port, db_schema):
+    def create_connection(self, db_user, db_password, db_host, db_port, db_schema):
         """
         Create a connection and a cursor object to MariaDB Platform.
         
