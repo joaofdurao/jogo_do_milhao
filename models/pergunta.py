@@ -1,6 +1,5 @@
 import json
 
-
 class Pergunta:
     def __init__(self, texto, resposta_correta, opcoes_respostas, dificuldade, id = None):
         self.id = id

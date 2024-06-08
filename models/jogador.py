@@ -1,6 +1,4 @@
 import json
-import re
-
 
 class Jogador:
     def __init__(self, nome, id = None):
