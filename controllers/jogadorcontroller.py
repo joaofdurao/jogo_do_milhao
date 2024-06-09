@@ -1,3 +1,5 @@
+import json
+from matplotlib.font_manager import json_load
 from models import jogador
 from models.jogador import Jogador
 from repositories.jogadordao import JogadorDAO
@@ -12,11 +14,13 @@ class JogadorController:
         return self.dao._create(jogador)
 
     def buscar_jogador_recente(self):
-        return self.dao.find_max_id()
+        jogador_info = self.dao.find_max_id()
+        jogador = Jogador(id= jogador_info[0], nome = jogador_info[1], saldo = jogador_info[2], respostas_corretas = jogador_info[3], ajudas_disponiveis = jogador_info[4])
+        return jogador
 
     def atualizar_pontuacao(self, jogador_id, contador):
         jogador_info = self.dao.find_by_id(jogador_id)
-        jogador = Jogador(nome = jogador_info[1], saldo = jogador_info[2])
+        jogador = Jogador(id= jogador_info[0], nome = jogador_info[1], saldo = jogador_info[2], respostas_corretas = jogador_info[3], ajudas_disponiveis = jogador_info[4])
 
         if contador == 0:
             jogador.saldo = 0
@@ -44,4 +48,20 @@ class JogadorController:
         self.dao.update(jogador, jogador_id)
         return jogador.saldo
         
+    def verifica_ajuda(self, jogador_id):
+        jogador_info = self.dao.find_by_id(jogador_id)
+        jogador = Jogador(id= jogador_info[0], nome = jogador_info[1], saldo = jogador_info[2], respostas_corretas = jogador_info[3], ajudas_disponiveis = jogador_info[4])
+        format_ajudas_disponiveis = jogador.ajudas_disponiveis.strip('[]').replace('"','').split(", ")
+        
+        return format_ajudas_disponiveis
+
+    def usar_ajuda(self, jogador_id, ajuda):
+
+        jogador_info = self.dao.find_by_id(jogador_id)
+        jogador = Jogador(id= jogador_info[0], nome = jogador_info[1], saldo = jogador_info[2], respostas_corretas = jogador_info[3], ajudas_disponiveis = jogador_info[4])
+        format_ajudas_disponiveis = jogador.ajudas_disponiveis.strip('[]').replace('"','').split(", ")
+
+        format_ajudas_disponiveis.remove(ajuda)
+        jogador.ajudas_disponiveis = json.dumps(format_ajudas_disponiveis)
+        self.dao.update(jogador, jogador_id)
 

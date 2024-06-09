@@ -1,3 +1,4 @@
+import logging
 from operator import index
 import tkinter as tk
 
@@ -15,7 +16,6 @@ class Janela(tk.Tk):
         self.geometry("1280x720")
         self.title("Quem Quer Ser um Milionário")
         self.tela_atual = None
-        self.contador = 0
         self.jogador = None
         self.perguntas_list = []
         
@@ -28,7 +28,7 @@ class Janela(tk.Tk):
         self.tela_atual.pack()
 
     def mudar_tela_jogo(self, nova_tela):
-        if self.contador < 15:
+        if self.jogador.respostas_corretas < 15:
             if self.tela_atual:
                 self.tela_atual.destroy()
             self.tela_atual = nova_tela
@@ -107,7 +107,7 @@ class TelaRegras(tk.Frame):
     def iniciar(self, nome):
         JogadorController().criar_jogador(nome)
         self.manager.jogador = JogadorController().buscar_jogador_recente()
-        print(self.manager.jogador)
+        logging.debug(self.manager.jogador)
         self.destroy()
         self.manager.mudar_tela_jogo(TelaEspera(self.master, self.manager))
 
@@ -116,7 +116,7 @@ class TelaEspera(tk.Frame):
         super().__init__(master)
         self.manager = manager
 
-        jogador_nome = self.manager.jogador[1]
+        jogador_nome = self.manager.jogador.nome
 
         # Create a label for the instruction
         label_instrucao = tk.Label(self, text="Aperte quando estiver pronto para responder a pergunta", font=("Arial", 24))
@@ -142,11 +142,12 @@ class TelaPergunta(tk.Frame):
 
         self.definir_pergunta()
         self.formatar_respostas()
-        jogador_nome = self.manager.jogador[1]
-        self.saldo = JogadorController().atualizar_pontuacao(self.manager.jogador[0], self.manager.contador)
-        print(self.pergunta)
-        print(self.respostas)
-        print(type(self.resposta_correta))
+        self.definir_ajudas()
+        jogador_nome = self.manager.jogador.nome
+        self.saldo = JogadorController().atualizar_pontuacao(self.manager.jogador.id, self.manager.jogador.respostas_corretas)
+        logging.debug(self.pergunta)
+        logging.debug(self.respostas)
+        logging.debug(type(self.resposta_correta))
 
 
         # Create a label for the question
@@ -159,16 +160,32 @@ class TelaPergunta(tk.Frame):
 
         # Create buttons individually
         botao_resposta0 = tk.Button(frame_botoes, text=self.respostas[0], command=lambda: self.verifica_resposta(0), width=20, height=7, bg="orange", fg="white")
-        botao_resposta0.grid(row=0, column=0, padx=10, pady=10)
+        botao_resposta0.grid(row=0, column=1, padx=10, pady=10)
 
         botao_resposta1 = tk.Button(frame_botoes, text=self.respostas[1], command=lambda: self.verifica_resposta(1), width=20, height=7, bg="orange", fg="white")
-        botao_resposta1.grid(row=0, column=1, padx=10, pady=10)
+        botao_resposta1.grid(row=0, column=2, padx=10, pady=10)
 
         botao_resposta2 = tk.Button(frame_botoes, text=self.respostas[2], command=lambda: self.verifica_resposta(2), width=20, height=7, bg="orange", fg="white")
-        botao_resposta2.grid(row=1, column=0, padx=10, pady=10)
+        botao_resposta2.grid(row=1, column=1, padx=10, pady=10)
 
         botao_resposta3 = tk.Button(frame_botoes, text=self.respostas[3], command=lambda: self.verifica_resposta(3), width=20, height=7, bg="orange", fg="white")
-        botao_resposta3.grid(row=1, column=1, padx=10, pady=10)
+        botao_resposta3.grid(row=1, column=2, padx=10, pady=10)
+
+        if 'pular' in self.ajudas:
+            botao_ajuda1 = tk.Button(frame_botoes, text='PULAR\nPERGUNTA', command= lambda: self.executa_ajuda('pular'), width=20, height=7, bg="orange", fg="white")
+            botao_ajuda1.grid(row=2, column=0, padx=10, pady=10)
+
+        if 'cartas' in self.ajudas:
+            botao_ajuda2 = tk.Button(frame_botoes, text='CARTAS', command= lambda: self.executa_ajuda('cartas'), width=20, height=7, bg="orange", fg="white")
+            botao_ajuda2.grid(row=2, column=1, padx=10, pady=10)
+
+        if 'plateia' in self.ajudas:
+            botao_ajuda3 = tk.Button(frame_botoes, text='PLATEIA', command= lambda: self.executa_ajuda('plateia'), width=20, height=7, bg="orange", fg="white")
+            botao_ajuda3.grid(row=2, column=2, padx=10, pady=10)
+
+        if '5050' in self.ajudas:
+            botao_ajuda4 = tk.Button(frame_botoes, text='5050', command= lambda: self.executa_ajuda('5050'), width=20, height=7, bg="orange", fg="white")
+            botao_ajuda4.grid(row=2, column=3, padx=10, pady=10)
 
         # Create a label for the bottom left corner
         label_bottom_left = tk.Label(self, text=f'Jogador:{jogador_nome}', font=("Arial", 20))
@@ -179,15 +196,15 @@ class TelaPergunta(tk.Frame):
         label_bottom_right.pack(side="bottom", anchor="se")
 
     def definir_pergunta(self):
-        if self.manager.contador < 10:
+        if self.manager.jogador.respostas_corretas < 10:
             self.pergunta = PerguntaController().randomizar_pergunta('Fácil', self.manager.perguntas_list)
-        elif self.manager.contador < 24:
+        elif self.manager.jogador.respostas_corretas < 24:
             self.pergunta = PerguntaController().randomizar_pergunta('Média', self.manager.perguntas_list)
         else:
             self.pergunta = PerguntaController().randomizar_pergunta('Difícil', self.manager.perguntas_list)
 
         self.manager.perguntas_list.append(self.pergunta[0])
-        print(self.manager.perguntas_list)
+        logging.debug(self.manager.perguntas_list)
 
     def formatar_respostas(self):
         self.respostas = []
@@ -198,13 +215,19 @@ class TelaPergunta(tk.Frame):
         self.resposta_correta = self.pergunta[3]
 
     def verifica_resposta(self, btn):
-        print('oi')
         if btn == self.resposta_correta:
-            self.manager.contador += 1
+            self.manager.jogador.respostas_corretas += 1
             self.manager.mudar_tela_jogo(TelaEspera(self.master, self.manager))
         else:
             self.manager.mudar_tela(TelaFim(self.master, self.manager))
 
+    def definir_ajudas(self):
+        self.ajudas = JogadorController().verifica_ajuda(self.manager.jogador.id)
+    
+    def executa_ajuda(self, ajuda):
+        JogadorController().usar_ajuda(self.manager.jogador.id, ajuda)
+    
+    
 class TelaFim(tk.Frame):
     def __init__(self, master, manager):
         super().__init__(master)
@@ -219,7 +242,7 @@ class TelaFim(tk.Frame):
         botao_reiniciar.pack(pady=10)
 
     def reiniciar(self):
-        self.manager.contador = 0
+        self.manager.jogador.respostas_corretas = 0
         self.manager.perguntas_list = []
         self.destroy()
         self.manager.mudar_tela(TelaInicio(self.master, self.manager))
