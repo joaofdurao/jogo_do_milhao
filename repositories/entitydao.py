@@ -1,7 +1,6 @@
-from ctypes.util import find_library
 import mariadb
 from config.cursormariadb import CursorMariaDB
-from abc import ABC, abstractmethod
+from abc import ABC
 
 """
 Este módulo contém a classe EntityDAO, que é uma classe abstrata

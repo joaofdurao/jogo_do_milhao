@@ -1,9 +1,7 @@
 import os
-import re
 import tkinter as tk
 from tkinter import messagebox
 
-from matplotlib.pylab import rand
 from controllers.jogadorcontroller import JogadorController
 from controllers.perguntacontroller import PerguntaController
 import random
@@ -49,11 +47,10 @@ class TelaInicio(tk.Frame):
 
         current_dir = os.getcwd()
         current_dir = current_dir.replace('\\', '/')
-        imagem = tk.PhotoImage(file=f'{current_dir}/views/logo (256).png')
+        imagem = tk.PhotoImage(file=f'{current_dir}/views/imagem1.png')
         self.imagem_widget = self.canvas.create_image(240, 200, anchor="center", image=imagem)
-        self.image_ref = imagem  # Keep a reference to the image
+        self.image_ref = imagem
 
-        # Adicionar o botão JOGAR no canvas
         botao_jogar = tk.Button(self, text="Jogar", command=self.jogar, width=30, height=2, bg="yellow", fg="black", font=("Arial", 14))
         self.canvas.create_window(240, 600, anchor="center", window=botao_jogar)
 
@@ -63,7 +60,7 @@ class TelaInicio(tk.Frame):
     
 class TelaRegras(tk.Frame):
     def __init__(self, master, manager):
-        super().__init__(master, bg="purple") #Definindo o fundo roxo
+        super().__init__(master, bg="purple")
         self.manager = manager
 
         regras_txt = (
@@ -85,23 +82,18 @@ class TelaRegras(tk.Frame):
             "Agora que você conhece as regras, está pronto para começar? Boa sorte!"
         )
 
-        # Create a label for the title
         titulo = tk.Label(self, text="Bem-vindo ao 'Quem Quer Ser um Milionário'!\n", font=("Arial", 14, "bold"), bg="purple", fg="white")
         titulo.pack(pady=10)
-        
-        # Create a text widget for the rules
+
         regras = tk.Label(self, text=regras_txt, font=("Arial", 10), justify="left", wraplength=460, bg="purple", fg="white")
         regras.pack(pady=10)
 
-        # Create a label for the name input
         label_nome = tk.Label(self, text="Digite seu nome:", font=("Arial", 12), bg="purple", fg="white")
         label_nome.pack(pady=10)
 
-        # Create an entry widget for the name input
         self.entry_nome = tk.Entry(self, font=("Arial", 12))
         self.entry_nome.pack(pady=5)
 
-        # Create a button to submit the name
         botao_submit = tk.Button(self, text="Iniciar jogo", command=self.iniciar, width=15, height=2, bg="yellow", fg="black", font=("Arial", 12))
         botao_submit.pack(pady=10)
 
@@ -117,20 +109,17 @@ class TelaRegras(tk.Frame):
 
 class TelaEspera(tk.Frame):
     def __init__(self, master, manager):
-        super().__init__(master, width=400, height=800, bg="purple")  # Definindo as dimensões e o fundo roxo
+        super().__init__(master, width=400, height=800, bg="purple")
         self.manager = manager
 
         jogador_nome = self.manager.jogador.nome
 
-        # Create a label for the player's name
         label_jogador_nome = tk.Label(self, text=f'Jogador: {jogador_nome}', font=("Arial", 12), bg="purple", fg="white")
         label_jogador_nome.place(relx=0.5, rely=0.3, anchor="center")
 
-        # Create a label for the instruction
         label_instrucao = tk.Label(self, text="Aperte quando estiver pronto para\nresponder a pergunta!", font=("Arial", 14), bg="purple", fg="white", wraplength=380, justify="center")
         label_instrucao.place(relx=0.5, rely=0.45, anchor="center")
 
-        # Create a button for when the user is ready
         botao_pronto = tk.Button(self, text="Pronto", command=self.responder_pergunta, width=10, height=3, font=("Arial", 12), bg="yellow", fg="black")
         botao_pronto.place(relx=0.5, rely=0.6, anchor="center")
 
@@ -140,8 +129,8 @@ class TelaEspera(tk.Frame):
 class TelaPergunta(tk.Frame):
     def __init__(self, master, manager):
         super().__init__(master)
-        master.configure(bg="purple")  # Define a cor de fundo da janela principal como roxo
-        self.configure(bg="purple")  # Define a cor de fundo da própria frame como roxo
+        master.configure(bg="purple") 
+        self.configure(bg="purple") 
         self.manager = manager
 
         self.definir_pergunta()
@@ -153,19 +142,15 @@ class TelaPergunta(tk.Frame):
         print(self.respostas)
         print(type(self.resposta_correta))
 
-        # Criando um label para o nome do jogador
         label_jogador_nome = tk.Label(self, text=f'Jogador: {jogador_nome}', font=("Arial", 14), bg="purple", fg="white")
         label_jogador_nome.pack(pady=(20, 10))
 
-        # Criando um frame para o conteúdo principal
         self.frame_conteudo = tk.Frame(self, bg="purple")
         self.frame_conteudo.pack(expand=True)
 
-        # Criando um label para a pergunta
         label_pergunta = tk.Label(self.frame_conteudo, text=self.pergunta[1], font=("Arial", 16), bg="purple", fg="white", wraplength=380)
         label_pergunta.grid(row=0, column=0, columnspan=2, padx=10, pady=20)
 
-        # Create buttons individually
         botao_resposta0 = tk.Button(self.frame_conteudo, text=f'A) {self.respostas[0]}', command=lambda: self.verifica_resposta(0), width=20, height=2, bg="yellow", fg="black", font=("Arial", 12, "bold"))
         botao_resposta0.grid(row=1, column=0, padx=10, pady=10)
 
@@ -178,7 +163,7 @@ class TelaPergunta(tk.Frame):
         botao_resposta3 = tk.Button(self.frame_conteudo, text=f'D) {self.respostas[3]}', command=lambda: self.verifica_resposta(3), width=20, height=2, bg="yellow", fg="black", font=("Arial", 12, "bold"))
         botao_resposta3.grid(row=2, column=1, padx=10, pady=10)
 
-        # Criando um frame para os botões de ajuda
+
         self.frame_ajuda = tk.Frame(self.frame_conteudo, bg="purple")
         self.frame_ajuda.grid(row= 3, column=0, columnspan=2, pady=10)
 
@@ -198,11 +183,9 @@ class TelaPergunta(tk.Frame):
             botao_ajuda4 = tk.Button(self.frame_ajuda, text='5050', command= lambda: self.aciona_ajuda('5050'), width=10, height=2, bg="orange", fg="white", font=("Arial", 10, "bold"))
             botao_ajuda4.grid(row=0, column=3, padx=10, pady=10)
 
-        # Criando um label para o saldo do jogador
         label_saldo = tk.Label(self, text=f'Saldo: {self.saldo}', font=("Arial", 14), bg="purple", fg="white")
         label_saldo.pack(side="bottom", padx=10, pady=10)
 
-        # Posicionando a frame no centro da tela
         self.place(relx=0.5, rely=0.5, anchor="center")
 
     def definir_pergunta(self):
@@ -303,23 +286,18 @@ class TelaPergunta(tk.Frame):
         label_plateia = tk.Label(self.frame_plateia, text='A plateia acha que a resposta correta é:', font=("Arial", 16), bg="purple", fg="white", wraplength=380)
         label_plateia.grid(row=0, columnspan=4, pady=10)
 
-        # Create the button to trigger the chart
         botao_plateia = tk.Button(self.frame_plateia, text='Mostrar Gráfico', command=lambda: mostra_grafico(), width=15, height=2, bg="orange", fg="white", font=("Arial", 10, "bold"))
         botao_plateia.grid(row=1, column=1, columnspan=2, padx=10, pady=10)
 
         def mostra_grafico():
             botao_plateia.grid_remove()
-            # Definir os rótulos e a resposta correta
             labels = ['A', 'B', 'C', 'D']
             respostas_index = [0, 1, 2, 3]
             respostas_index.remove(self.resposta_correta)
             votos_unit = [0, 0, 0, 0]
             votos_porc = [0, 0, 0, 0]
+            total_votos = 100  
 
-            # Distribuir votos conforme as probabilidades desejadas
-            total_votos = 100  # Número total de votos
-
-            # Probabilidades desejadas
             probabilidades = [0.4, 0.25, 0.25, 0.1]
             votos_unit[self.resposta_correta] = int(total_votos * probabilidades[0])
 
@@ -329,33 +307,26 @@ class TelaPergunta(tk.Frame):
             for i, j in enumerate(respostas_index):
                 votos_unit[j] = int(total_votos * outras_probabilidades[i])
 
-            # Ajustar a soma total para garantir que some exatamente 100
             diff = total_votos - sum(votos_unit)
             if diff != 0:
                 votos_unit[self.resposta_correta] += diff
 
-            # Calcular a porcentagem de votos para cada opção
             for index in range(len(votos_unit)):
                 votos_porc[index] = (votos_unit[index] / total_votos) * 100
 
-            # Criar uma figura e um objeto de eixo, ajustando o tamanho para se encaixar na janela
-            fig, ax = plt.subplots(figsize=(4.5, 3))  # Ajustar o tamanho da figura
+            fig, ax = plt.subplots(figsize=(4.5, 3))
 
-            # Criar um gráfico de barras
             ax.bar(labels, votos_porc)
 
-            # Definir rótulos e título
             ax.set_xlabel('Respostas')
             ax.set_ylabel('Porcentagem de votos')
             ax.set_title('Opinião da plateia')
 
-            # Integrar o gráfico no frame do Tkinter
             canvas = FigureCanvasTkAgg(fig, master=self.frame_plateia)
             canvas.draw()
             canvas.get_tk_widget().grid(row=2, column=0, columnspan=4, pady=10, sticky="nsew")
 
     def executa_5050(self):
-        # Find two random indices that are not equal to the correct index
         indices_excluidos = []
         while len(indices_excluidos) < 2:
             indice = random.randint(0, len(self.respostas) - 1)
@@ -379,46 +350,40 @@ class TelaPergunta(tk.Frame):
         
 class TelaFim(tk.Frame):
     def __init__(self, master, manager):
-        super().__init__(master, bg="purple", width=400, height=800)  # Define a cor de fundo como roxo e as dimensões da tela
+        super().__init__(master, bg="purple", width=400, height=800)
         self.manager = manager
 
         respostas = self.manager.jogador.respostas_corretas
 
-        # Criando um frame para centralizar o conteúdo
         frame_central = tk.Frame(self, bg="purple")
-        frame_central.place(relx=0.5, rely=0.5, anchor="center")  # Coloca o frame no centro da tela
+        frame_central.place(relx=0.5, rely=0.5, anchor="center") 
 
-        # Criando um label para o fim do jogo
         if respostas == 15:
             mensagem = "Parabéns!\nVocê ganhou 1 milhão de reais!"
         else:
             mensagem = "Você perdeu tudo!\nTente novamente!"
-        label_fim = tk.Label(frame_central, text=mensagem, font=("Arial", 18), fg="white", bg="purple")  # Define a cor do texto como branco e o fundo como roxo
+        label_fim = tk.Label(frame_central, text=mensagem, font=("Arial", 18), fg="white", bg="purple")
         label_fim.pack(pady=20)
 
-        # Exibir fogos de artifício se o jogador for um vencedor
         if respostas == 15:
             try:
                 self.exibir_fogos_artificio(frame_central)
             except Exception as e:
                 print("Erro ao carregar a imagem de fogos de artifício:", e)
 
-        # Criando um botão para reiniciar o jogo
         botao_reiniciar = tk.Button(frame_central, text="Reiniciar", command=self.reiniciar, width=20, height=2, bg="yellow", fg="black", font=("Arial", 12))  # Define a cor de fundo como amarelo, o texto como preto e a fonte como Arial tamanho 12
         botao_reiniciar.pack(pady=10)
 
     def exibir_fogos_artificio(self, frame):
-        # Carregar a imagem do arquivo GIF
         try:
 
             current_dir = os.getcwd()
             current_dir = current_dir.replace('\\', '/')
-            image = Image.open(f'{current_dir}/views/fogo-de-artificio-imagem-animada-0087.gif')
+            image = Image.open(f'{current_dir}/views/gif_fogos.gif')
             photo = ImageTk.PhotoImage(image)
 
-            # Criar um label para exibir o GIF
             label_fogos = tk.Label(frame, image=photo, bg="purple")
-            label_fogos.image = photo  # Manter uma referência para evitar que a imagem seja coletada pelo garbage collector
+            label_fogos.image = photo
             label_fogos.pack()
         except Exception as e:
             raise e

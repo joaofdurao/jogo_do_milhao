@@ -1,6 +1,4 @@
 import json
-from matplotlib.font_manager import json_load
-from models import jogador
 from models.jogador import Jogador
 from repositories.jogadordao import JogadorDAO
 

@@ -1,4 +1,3 @@
-from models.pergunta import Pergunta
 from repositories.perguntadao import PerguntaDAO
 import random
 
