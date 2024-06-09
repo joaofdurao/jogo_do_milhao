@@ -18,32 +18,40 @@ class JogadorController:
         jogador = Jogador(id= jogador_info[0], nome = jogador_info[1], saldo = jogador_info[2], respostas_corretas = jogador_info[3], ajudas_disponiveis = jogador_info[4])
         return jogador
 
-    def atualizar_pontuacao(self, jogador_id, contador):
+    def atualizar_pontuacao(self, jogador_id, respostas_corretas):
         jogador_info = self.dao.find_by_id(jogador_id)
         jogador = Jogador(id= jogador_info[0], nome = jogador_info[1], saldo = jogador_info[2], respostas_corretas = jogador_info[3], ajudas_disponiveis = jogador_info[4])
 
-        if contador == 0:
-            jogador.saldo = 0
-        elif contador == 1:
-            jogador.saldo += 500
-        elif contador == 2 or contador == 3:
-            jogador.saldo += 1000
-        elif contador == 4:
-            jogador.saldo += 2000
-        elif contador == 5 or contador == 6 or contador == 7:
-            jogador.saldo += 5000
-        elif contador == 8:
-            jogador.saldo += 10000
-        elif contador == 9:
-            jogador.saldo += 20000
-        elif contador == 10 or contador == 11:
-            jogador.saldo += 50000
-        elif contador == 12:
-            jogador.saldo += 150000
-        elif contador == 13:
-            jogador.saldo += 200000
-        elif contador == 14:
-            jogador.saldo += 500000
+        if respostas_corretas == 1:
+            jogador.saldo = 500
+        elif respostas_corretas == 2:
+            jogador.saldo = 1000
+        elif respostas_corretas == 3:
+            jogador.saldo = 2000
+        elif respostas_corretas == 4:
+            jogador.saldo = 3000
+        elif respostas_corretas == 5:
+            jogador.saldo = 5000
+        elif respostas_corretas == 6:
+            jogador.saldo = 10000 
+        elif respostas_corretas == 7:
+            jogador.saldo = 15000
+        elif respostas_corretas == 8:
+            jogador.saldo = 20000
+        elif respostas_corretas == 9:
+            jogador.saldo = 30000
+        elif respostas_corretas == 10:
+            jogador.saldo = 50000
+        elif respostas_corretas == 11:
+            jogador.saldo = 100000
+        elif respostas_corretas == 12:
+            jogador.saldo = 150000
+        elif respostas_corretas == 13:
+            jogador.saldo = 300000
+        elif respostas_corretas == 14:
+            jogador.saldo = 500000
+        elif respostas_corretas == 15:
+            jogador.saldo = 1000000
         
         self.dao.update(jogador, jogador_id)
         return jogador.saldo

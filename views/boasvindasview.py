@@ -1,14 +1,9 @@
-import logging
-from operator import index
+import os
 import tkinter as tk
-
-from matplotlib.pyplot import cla
-
 from controllers.jogadorcontroller import JogadorController
 from controllers.perguntacontroller import PerguntaController
-from models import jogador
-from models.pergunta import Pergunta
-import os
+import random
+
 
 class Janela(tk.Tk):
     def __init__(self):
@@ -38,7 +33,6 @@ class Janela(tk.Tk):
                 self.tela_atual.destroy()
             self.tela_atual = TelaFim(self, self)
             self.tela_atual.pack()
-        
         
 class TelaInicio(tk.Frame):
     def __init__(self, master, manager):
@@ -107,7 +101,7 @@ class TelaRegras(tk.Frame):
     def iniciar(self, nome):
         JogadorController().criar_jogador(nome)
         self.manager.jogador = JogadorController().buscar_jogador_recente()
-        logging.debug(self.manager.jogador)
+        print(self.manager.jogador)
         self.destroy()
         self.manager.mudar_tela_jogo(TelaEspera(self.master, self.manager))
 
@@ -145,9 +139,9 @@ class TelaPergunta(tk.Frame):
         self.definir_ajudas()
         jogador_nome = self.manager.jogador.nome
         self.saldo = JogadorController().atualizar_pontuacao(self.manager.jogador.id, self.manager.jogador.respostas_corretas)
-        logging.debug(self.pergunta)
-        logging.debug(self.respostas)
-        logging.debug(type(self.resposta_correta))
+        print(self.pergunta)
+        print(self.respostas)
+        print(type(self.resposta_correta))
 
 
         # Create a label for the question
@@ -155,36 +149,36 @@ class TelaPergunta(tk.Frame):
         label_pergunta.pack(pady=20)
 
         # Create a frame to hold the buttons
-        frame_botoes = tk.Frame(self)
-        frame_botoes.pack()
+        self.frame_botoes = tk.Frame(self)
+        self.frame_botoes.pack()
 
         # Create buttons individually
-        botao_resposta0 = tk.Button(frame_botoes, text=self.respostas[0], command=lambda: self.verifica_resposta(0), width=20, height=7, bg="orange", fg="white")
+        botao_resposta0 = tk.Button(self.frame_botoes, text=self.respostas[0], command=lambda: self.verifica_resposta(0), width=20, height=7, bg="orange", fg="white")
         botao_resposta0.grid(row=0, column=1, padx=10, pady=10)
 
-        botao_resposta1 = tk.Button(frame_botoes, text=self.respostas[1], command=lambda: self.verifica_resposta(1), width=20, height=7, bg="orange", fg="white")
+        botao_resposta1 = tk.Button(self.frame_botoes, text=self.respostas[1], command=lambda: self.verifica_resposta(1), width=20, height=7, bg="orange", fg="white")
         botao_resposta1.grid(row=0, column=2, padx=10, pady=10)
 
-        botao_resposta2 = tk.Button(frame_botoes, text=self.respostas[2], command=lambda: self.verifica_resposta(2), width=20, height=7, bg="orange", fg="white")
+        botao_resposta2 = tk.Button(self.frame_botoes, text=self.respostas[2], command=lambda: self.verifica_resposta(2), width=20, height=7, bg="orange", fg="white")
         botao_resposta2.grid(row=1, column=1, padx=10, pady=10)
 
-        botao_resposta3 = tk.Button(frame_botoes, text=self.respostas[3], command=lambda: self.verifica_resposta(3), width=20, height=7, bg="orange", fg="white")
+        botao_resposta3 = tk.Button(self.frame_botoes, text=self.respostas[3], command=lambda: self.verifica_resposta(3), width=20, height=7, bg="orange", fg="white")
         botao_resposta3.grid(row=1, column=2, padx=10, pady=10)
 
         if 'pular' in self.ajudas:
-            botao_ajuda1 = tk.Button(frame_botoes, text='PULAR\nPERGUNTA', command= lambda: self.executa_ajuda('pular'), width=20, height=7, bg="orange", fg="white")
+            botao_ajuda1 = tk.Button(self.frame_botoes, text='PULAR\nPERGUNTA', command= lambda: self.aciona_ajuda('pular'), width=20, height=7, bg="orange", fg="white")
             botao_ajuda1.grid(row=2, column=0, padx=10, pady=10)
 
         if 'cartas' in self.ajudas:
-            botao_ajuda2 = tk.Button(frame_botoes, text='CARTAS', command= lambda: self.executa_ajuda('cartas'), width=20, height=7, bg="orange", fg="white")
+            botao_ajuda2 = tk.Button(self.frame_botoes, text='CARTAS', command= lambda: self.aciona_ajuda('cartas'), width=20, height=7, bg="orange", fg="white")
             botao_ajuda2.grid(row=2, column=1, padx=10, pady=10)
 
         if 'plateia' in self.ajudas:
-            botao_ajuda3 = tk.Button(frame_botoes, text='PLATEIA', command= lambda: self.executa_ajuda('plateia'), width=20, height=7, bg="orange", fg="white")
+            botao_ajuda3 = tk.Button(self.frame_botoes, text='PLATEIA', command= lambda: self.aciona_ajuda('plateia'), width=20, height=7, bg="orange", fg="white")
             botao_ajuda3.grid(row=2, column=2, padx=10, pady=10)
 
         if '5050' in self.ajudas:
-            botao_ajuda4 = tk.Button(frame_botoes, text='5050', command= lambda: self.executa_ajuda('5050'), width=20, height=7, bg="orange", fg="white")
+            botao_ajuda4 = tk.Button(self.frame_botoes, text='5050', command= lambda: self.aciona_ajuda('5050'), width=20, height=7, bg="orange", fg="white")
             botao_ajuda4.grid(row=2, column=3, padx=10, pady=10)
 
         # Create a label for the bottom left corner
@@ -204,7 +198,7 @@ class TelaPergunta(tk.Frame):
             self.pergunta = PerguntaController().randomizar_pergunta('Difícil', self.manager.perguntas_list)
 
         self.manager.perguntas_list.append(self.pergunta[0])
-        logging.debug(self.manager.perguntas_list)
+        print(self.manager.perguntas_list)
 
     def formatar_respostas(self):
         self.respostas = []
@@ -224,10 +218,95 @@ class TelaPergunta(tk.Frame):
     def definir_ajudas(self):
         self.ajudas = JogadorController().verifica_ajuda(self.manager.jogador.id)
     
-    def executa_ajuda(self, ajuda):
+    def aciona_ajuda(self, ajuda):
         JogadorController().usar_ajuda(self.manager.jogador.id, ajuda)
+        
+        if ajuda == 'pular':
+            self.executa_pular()
+        elif ajuda == 'cartas':
+            self.executa_cartas()
+        elif ajuda == 'plateia':
+            self.executa_plateia()
+        elif ajuda == '5050':
+            self.executa_5050()
     
-    
+    def executa_pular(self):
+        self.manager.jogador.respostas_corretas += 1
+        self.manager.mudar_tela_jogo(TelaEspera(self.master, self.manager))
+
+    def executa_cartas(self):
+
+        label_carta = tk.Label(self.frame_botoes, text='Escolha uma carta:', font=("Arial", 16))
+        label_carta.grid(row=3, columnspan=4, pady=10)
+
+        botao_carta1 = tk.Button(self.frame_botoes, text='A', command=lambda: define_cartas(), width=20, height=7, bg="orange", fg="white")
+        botao_carta1.grid(row=4, column=0, padx=10, pady=10)
+
+        botao_carta2 = tk.Button(self.frame_botoes, text='B', command=lambda: define_cartas(), width=20, height=7, bg="orange", fg="white")
+        botao_carta2.grid(row=4, column=1, padx=10, pady=10)
+
+        botao_carta3 = tk.Button(self.frame_botoes, text='C', command=lambda: define_cartas(), width=20, height=7, bg="orange", fg="white")
+        botao_carta3.grid(row=4, column=2, padx=10, pady=10)
+
+        botao_carta4 = tk.Button(self.frame_botoes, text='D', command=lambda: define_cartas(), width=20, height=7, bg="orange", fg="white")
+        botao_carta4.grid(row=4, column=3, padx=10, pady=10)
+
+        def define_cartas():
+            numero_aleatorio = random.randint(0, 3)
+                
+            for widget in self.frame_botoes.grid_slaves(row=4):
+                widget.grid_remove()
+
+            indices_excluidos = []
+            while len(indices_excluidos) < numero_aleatorio:
+                indice = random.randint(0, len(self.respostas) - 1)
+                if indice != self.resposta_correta and indice not in indices_excluidos:
+                    indices_excluidos.append(indice)
+
+            print('iii', indices_excluidos)
+            print('rrr', self.resposta_correta)
+
+            for i in indices_excluidos:
+                if i == 0:
+                    self.frame_botoes.grid_slaves(row=0, column=1)[0].grid_remove()
+                elif i == 1:
+                    self.frame_botoes.grid_slaves(row=0, column=2)[0].grid_remove()
+                elif i == 2:
+                    self.frame_botoes.grid_slaves(row=1, column=1)[0].grid_remove()
+                elif i == 3:
+                    self.frame_botoes.grid_slaves(row=1, column=2)[0].grid_remove()
+
+            self.frame_botoes.grid_slaves(row=2, column=1)[0].grid_remove()
+
+            label_carta.config(text=f"Foram excluídas {numero_aleatorio} opções!")
+          
+
+    def executa_plateia(self):
+        pass
+
+    def executa_5050(self):
+        # Find two random indices that are not equal to the correct index
+        indices_excluidos = []
+        while len(indices_excluidos) < 2:
+            indice = random.randint(0, len(self.respostas) - 1)
+            if indice != self.resposta_correta and indice not in indices_excluidos:
+                indices_excluidos.append(indice)
+
+        print('iii', indices_excluidos)
+        print('rrr', self.resposta_correta)
+
+        for i in indices_excluidos:
+            if i == 0:
+                self.frame_botoes.grid_slaves(row=0, column=1)[0].grid_remove()
+            elif i == 1:
+                self.frame_botoes.grid_slaves(row=0, column=2)[0].grid_remove()
+            elif i == 2:
+                self.frame_botoes.grid_slaves(row=1, column=1)[0].grid_remove()
+            elif i == 3:
+                self.frame_botoes.grid_slaves(row=1, column=2)[0].grid_remove()
+
+        self.frame_botoes.grid_slaves(row=2, column=3)[0].grid_remove()
+        
 class TelaFim(tk.Frame):
     def __init__(self, master, manager):
         super().__init__(master)
