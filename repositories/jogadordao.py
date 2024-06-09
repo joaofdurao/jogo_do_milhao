@@ -2,6 +2,7 @@
 Essa classe representa um objeto de acesso a dados para a entidade 'Jogador'.
 Ela herda da classe 'EntityDAO'.
 """
+import mariadb
 from repositories.entitydao import EntityDAO
 
 class JogadorDAO(EntityDAO):
@@ -9,7 +10,7 @@ class JogadorDAO(EntityDAO):
     Classe responsável por realizar operações de acesso a dados para a entidade Jogador.
     """
 
-    def __init__(self, operation, *args):
+    def __init__(self):
         """
         Inicializa um objeto JogadorDAO.
 
@@ -18,9 +19,9 @@ class JogadorDAO(EntityDAO):
         - *args: Argumentos adicionais para a operação.
 
         """
-        super().__init__(operation, *args)
+        super().__init__()
 
-    def _create(self, jogador):
+    def create(self, jogador):
         """
         Cria um novo jogador.
 
@@ -33,7 +34,7 @@ class JogadorDAO(EntityDAO):
         """
         return super()._create(jogador)
 
-    def _find_by_id(self, jogador_id):
+    def find_by_id(self, jogador_id):
         """
         Busca um jogador pelo ID.
 
@@ -45,8 +46,31 @@ class JogadorDAO(EntityDAO):
 
         """
         return super()._find_by_id(jogador_id)
+    
+    def find_max_id(self):
+        """
+        Encontra o registro com o maior ID no banco de dados.
 
-    def _update(self, jogador, jogador_id):
+        Returns:
+            O registro correspondente, ou None se não encontrado.
+        """
+        table_name = "jogadordao_tb"
+        query = f"SELECT * FROM {table_name} ORDER BY id DESC LIMIT 1"
+        try:
+            self.cursor.execute(query)
+            result = self.cursor.fetchone()
+            if result:
+                return result
+            else:
+                print("Registro não encontrado")
+                return None
+        except mariadb.Error as e:
+            print(f"Erro ao encontrar registro: {e}")
+            return None
+        finally:
+            self.conn.close()
+
+    def update(self, jogador, jogador_id):
         """
         Atualiza um jogador.
 
@@ -60,7 +84,7 @@ class JogadorDAO(EntityDAO):
         """
         return super()._update(jogador, jogador_id)
 
-    def _delete(self, jogador_id):
+    def delete(self, jogador_id):
         """
         Exclui um jogador.
 

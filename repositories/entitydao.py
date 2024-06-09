@@ -1,3 +1,4 @@
+from ctypes.util import find_library
 import mariadb
 from config.cursormariadb import CursorMariaDB
 from abc import ABC, abstractmethod
@@ -13,7 +14,7 @@ class EntityDAO(ABC):
     Classe abstrata para Data Access Objects (DAOs) com operações básicas de CRUD.
     """
 
-    def __init__(self, operation, *args):
+    def __init__(self):
         """
         Inicializa o DAO com os detalhes da conexão com o banco de dados.
 
@@ -22,17 +23,6 @@ class EntityDAO(ABC):
             *args: Argumentos adicionais baseados na operação.
         """
         self.conn, self.cursor = self._connect()
-        if operation == "CREATE":
-            self.transaction_result = self._create(*args)
-        elif operation == "FIND":
-            self.transaction_result = self._find_by_id(*args)
-        elif operation == "UPDATE":
-            self.transaction_result = self._update(*args)
-        elif operation == "DELETE":
-            self.transaction_result = self._delete(*args)
-        else:
-            print("Operação inválida")
-        self.conn.close()
 
     def _connect(self):
         """
@@ -43,7 +33,7 @@ class EntityDAO(ABC):
         """
         return CursorMariaDB().create_connection()
 
-    @abstractmethod
+    
     def _create(self, obj):
         """
         Cria um novo registro no banco de dados.
@@ -69,8 +59,10 @@ class EntityDAO(ABC):
             print(f"Erro ao criar registro: {e}")
             self.conn.rollback()
             return False
+        finally:
+            self.conn.close()
 
-    @abstractmethod
+    
     def _find_by_id(self, entity_id):
         """
         Encontra um registro no banco de dados com base no ID da entidade fornecido.
@@ -94,8 +86,9 @@ class EntityDAO(ABC):
         except mariadb.Error as e:
             print(f"Erro ao encontrar registro: {e}")
             return None
-
-    @abstractmethod
+        finally:
+            self.conn.close()
+    
     def _update(self, obj, entity_id):
         """
         Atualiza um registro no banco de dados com base no ID fornecido.
@@ -122,8 +115,10 @@ class EntityDAO(ABC):
             print(f"Erro ao atualizar registro: {e}")
             self.conn.rollback()
             return False
+        finally:
+            self.conn.close()
 
-    @abstractmethod
+    
     def _delete(self, entity_id):
         """
         Exclui um registro do banco de dados com base no ID da entidade fornecido.
@@ -146,3 +141,5 @@ class EntityDAO(ABC):
             print(f"Erro ao excluir registro: {e}")
             self.conn.rollback()
             return False
+        finally:
+            self.conn.close()

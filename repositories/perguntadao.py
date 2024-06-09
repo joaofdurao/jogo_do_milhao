@@ -1,3 +1,4 @@
+import mariadb
 from repositories.entitydao import EntityDAO
 
 """
@@ -8,7 +9,7 @@ Ela herda da classe 'EntityDAO'.
 
 class PerguntaDAO(EntityDAO):
 
-    def __init__(self, operation, *args):
+    def __init__(self):
         """
         Inicializa um objeto PerguntaDAO.
 
@@ -17,9 +18,9 @@ class PerguntaDAO(EntityDAO):
         - *args: Argumentos adicionais para a operação.
 
         """
-        super().__init__(operation, *args)
+        super().__init__()
 
-    def _create(self, pergunta):
+    def create(self, pergunta):
         """
         Cria uma nova pergunta.
 
@@ -32,7 +33,7 @@ class PerguntaDAO(EntityDAO):
         """
         return super()._create(pergunta)
 
-    def _find_by_id(self, pergunta_id):
+    def find_by_id(self, pergunta_id):
         """
         Busca uma pergunta pelo ID.
 
@@ -45,7 +46,43 @@ class PerguntaDAO(EntityDAO):
         """
         return super()._find_by_id(pergunta_id)
 
-    def _update(self, pergunta, pergunta_id):
+    def find_by_dificuldade(self, dificuldade, lista_ids):
+        """
+        Encontra registros no banco de dados com base na dificuldade fornecida, excluindo os registros cujos IDs estão na lista fornecida.
+
+        Args:
+            dificuldade: A dificuldade a ser pesquisada.
+            lista_ids: Uma lista de IDs a serem excluídos da pesquisa.
+
+        Returns:
+            Uma lista de registros correspondentes, ou None se nenhum for encontrado.
+        """
+        table_name = "perguntadao_tb"
+        query = f"SELECT * FROM {table_name} WHERE dificuldade = %s"
+        
+        # Se houver IDs a serem excluídos, adicione a cláusula NOT IN
+        if lista_ids:
+            ids = ', '.join(['%s'] * len(lista_ids))
+            query += f" AND id NOT IN ({ids})"
+            params = (dificuldade, *lista_ids)
+        else:
+            params = (dificuldade,)
+        
+        try:
+            self.cursor.execute(query, params)
+            result = self.cursor.fetchall()
+            if result:
+                return result
+            else:
+                print("Nenhum registro encontrado")
+                return None
+        except mariadb.Error as e:
+            print(f"Erro ao encontrar registros: {e}")
+            return None
+        finally:
+            self.conn.close()
+
+    def update(self, pergunta, pergunta_id):
         """
         Atualiza uma pergunta.
 
@@ -59,7 +96,7 @@ class PerguntaDAO(EntityDAO):
         """
         return super()._update(pergunta, pergunta_id)
 
-    def _delete(self, pergunta_id):
+    def delete(self, pergunta_id):
         """
         Exclui uma pergunta.
 
@@ -71,3 +108,10 @@ class PerguntaDAO(EntityDAO):
 
         """
         return super()._delete(pergunta_id)
+
+    def close_connection(self):
+        """
+        Fecha a conexão com o banco de dados.
+
+        """
+        self.conn.close()
