@@ -7,6 +7,7 @@ from controllers.jogadorcontroller import JogadorController
 from controllers.perguntacontroller import PerguntaController
 from models import jogador
 from models.pergunta import Pergunta
+import os
 
 class Janela(tk.Tk):
     def __init__(self):
@@ -43,12 +44,15 @@ class TelaInicio(tk.Frame):
     def __init__(self, master, manager):
         super().__init__(master)
         self.manager = manager
+
+        current_dir = os.getcwd()
+        current_dir = current_dir.replace('\\', '/')
         # Create the image widget
-        imagem = tk.PhotoImage(file="C:/Users/joaof/OneDrive/Repositorios/FACUL/4º Período/Programação 3/jogo_do_milhao/views/quem_quer_ser_um_milionario_front.png")
+        imagem = tk.PhotoImage(file=f'{current_dir}/views/quem_quer_ser_um_milionario_front.png')
         self.imagem_widget = tk.Label(self, image=imagem)
         self.imagem_widget.image = imagem  # Keep a reference to the image
         self.imagem_widget.pack()
-
+        # C:\Users\joaof\OneDrive\Repositorios\FACUL\4º Período\Programação 3\jogo_do_milhao\views\boasvindasview.py
         # Create the "Jogar" button
         botao_jogar = tk.Button(self, text="Jogar", command=self.jogar, width=20, height=7, bg="green", fg="white")
         botao_jogar.lift()  # Mantém o botão em cima dos outros elementos
