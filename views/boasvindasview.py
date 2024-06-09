@@ -5,6 +5,7 @@ from matplotlib.pyplot import cla
 
 from controllers.jogadorcontroller import JogadorController
 from controllers.perguntacontroller import PerguntaController
+from models import jogador
 from models.pergunta import Pergunta
 
 class Janela(tk.Tk):
@@ -26,9 +27,7 @@ class Janela(tk.Tk):
         self.tela_atual.pack()
 
     def mudar_tela_jogo(self, nova_tela):
-        if self.contador < 30:
-            self.contador += 1
-
+        if self.contador < 15:
             if self.tela_atual:
                 self.tela_atual.destroy()
             self.tela_atual = nova_tela
@@ -113,9 +112,15 @@ class TelaEspera(tk.Frame):
         super().__init__(master)
         self.manager = manager
 
+        jogador_nome = self.manager.jogador[1]
+
         # Create a label for the instruction
         label_instrucao = tk.Label(self, text="Aperte quando estiver pronto para responder a pergunta", font=("Arial", 24))
         label_instrucao.pack(pady=20)
+
+        # Create a label for the bottom left corner
+        label_bottom_left = tk.Label(self, text=f'Jogador:{jogador_nome}', font=("Arial", 20))
+        label_bottom_left.pack(side="bottom", anchor="sw")
 
         # Create a button for when the user is ready
         botao_pronto = tk.Button(self, text="Pronto", command=self.responder_pergunta, width=10, height=3, bg="yellow", fg="black")
@@ -133,6 +138,8 @@ class TelaPergunta(tk.Frame):
 
         self.definir_pergunta()
         self.formatar_respostas()
+        jogador_nome = self.manager.jogador[1]
+        self.saldo = JogadorController().atualizar_pontuacao(self.manager.jogador[0], self.manager.contador)
         print(self.pergunta)
         print(self.respostas)
         print(type(self.resposta_correta))
@@ -159,7 +166,14 @@ class TelaPergunta(tk.Frame):
         botao_resposta3 = tk.Button(frame_botoes, text=self.respostas[3], command=lambda: self.verifica_resposta(3), width=20, height=7, bg="orange", fg="white")
         botao_resposta3.grid(row=1, column=1, padx=10, pady=10)
 
-    
+        # Create a label for the bottom left corner
+        label_bottom_left = tk.Label(self, text=f'Jogador:{jogador_nome}', font=("Arial", 20))
+        label_bottom_left.pack(side="bottom", anchor="sw")
+
+        # Create a label for the bottom right corner
+        label_bottom_right = tk.Label(self, text=f'Saldo: {self.saldo}', font=("Arial", 20))
+        label_bottom_right.pack(side="bottom", anchor="se")
+
     def definir_pergunta(self):
         if self.manager.contador < 10:
             self.pergunta = PerguntaController().randomizar_pergunta('Fácil', self.manager.perguntas_list)
@@ -182,6 +196,7 @@ class TelaPergunta(tk.Frame):
     def verifica_resposta(self, btn):
         print('oi')
         if btn == self.resposta_correta:
+            self.manager.contador += 1
             self.manager.mudar_tela_jogo(TelaEspera(self.master, self.manager))
         else:
             self.manager.mudar_tela(TelaFim(self.master, self.manager))

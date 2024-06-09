@@ -59,7 +59,7 @@ class PerguntaDAO(EntityDAO):
         """
         table_name = "perguntadao_tb"
         query = f"SELECT * FROM {table_name} WHERE dificuldade = %s"
-        
+        self.conn, self.cursor = self._connect()
         # Se houver IDs a serem excluídos, adicione a cláusula NOT IN
         if lista_ids:
             ids = ', '.join(['%s'] * len(lista_ids))

@@ -22,7 +22,6 @@ class EntityDAO(ABC):
             operation: A operação a ser realizada (CREATE, FIND, UPDATE, DELETE).
             *args: Argumentos adicionais baseados na operação.
         """
-        self.conn, self.cursor = self._connect()
 
     def _connect(self):
         """
@@ -49,7 +48,7 @@ class EntityDAO(ABC):
         values_space = ", ".join("?" * len(vars(obj).keys()))
         query = f"INSERT INTO {table_name} ({columns}) VALUES ({values_space})"
         values = tuple(vars(obj).values())
-
+        self.conn, self.cursor = self._connect()
         try:
             self.cursor.execute(query, values)
             self.conn.commit()
@@ -75,6 +74,7 @@ class EntityDAO(ABC):
         """
         table_name = str(self.__class__.__name__).lower() + "_tb"
         query = f"SELECT * FROM {table_name} WHERE id = %s"
+        self.conn, self.cursor = self._connect()
         try:
             self.cursor.execute(query, (entity_id,))
             result = self.cursor.fetchone()
@@ -105,6 +105,7 @@ class EntityDAO(ABC):
         columns = ", ".join([f"{attr} = ?" for attr in vars(obj).keys()])
         query = f"UPDATE {table_name} SET {columns} WHERE id = {entity_id}"
         values = tuple(vars(obj).values())
+        self.conn, self.cursor = self._connect()
 
         try:
             self.cursor.execute(query, values)
@@ -131,6 +132,7 @@ class EntityDAO(ABC):
         """
         table_name = str(self.__class__.__name__).lower() + "_tb"
         query = f"DELETE FROM {table_name} WHERE id = {entity_id}"
+        self.conn, self.cursor = self._connect()
 
         try:
             self.cursor.execute(query)

@@ -56,6 +56,7 @@ class JogadorDAO(EntityDAO):
         """
         table_name = "jogadordao_tb"
         query = f"SELECT * FROM {table_name} ORDER BY id DESC LIMIT 1"
+        self.conn, self.cursor = self._connect()
         try:
             self.cursor.execute(query)
             result = self.cursor.fetchone()
